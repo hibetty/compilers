@@ -3,8 +3,6 @@ function Calculator(inputString){
 }
 
 Calculator.prototype.lexer = function(inputString){
-  //returns an array of objects, each with properties 'name' and 'value'
-
   var tokenTypes = [
     ['NUMBER', /^\d+/],
     ['ADD', /^\+/],
@@ -38,8 +36,17 @@ Calculator.prototype.get = function(){
   return this.tokenStream.shift();
 }
 
-var calc = new Calculator('1+(2*3)+4');
-//console.log(calc.tokenStream);
-console.log(calc.get());
-console.log(calc.peek());
-console.log(calc.tokenStream);
+function TreeNode(name, ...children){
+  this.name = name;
+  this.children = children;
+}
+
+// var calc = new Calculator('1+(2*3)+4');
+// //console.log(calc.tokenStream);
+// console.log(calc.get());
+// console.log(calc.peek());
+// console.log(calc.tokenStream);
+
+var node = new TreeNode('awesome', 1, 3, 4, 5);
+console.log(node.name);
+console.log(node.children);
