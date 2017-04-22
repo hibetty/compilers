@@ -30,5 +30,16 @@ Calculator.prototype.lexer = function(inputString){
   return arrObjects;
 };
 
-var whee = new Calculator('hello');
-console.log(whee.tokenStream);
+Calculator.prototype.peek = function(){
+  return this.tokenStream[0] || null;
+}
+
+Calculator.prototype.get = function(){
+  return this.tokenStream.shift();
+}
+
+var calc = new Calculator('1+(2*3)+4');
+//console.log(calc.tokenStream);
+console.log(calc.get());
+console.log(calc.peek());
+console.log(calc.tokenStream);
