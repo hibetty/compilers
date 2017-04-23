@@ -58,7 +58,6 @@ Calculator.prototype.parseA = function(){
 };
 
 Calculator.prototype.parseTerm = function(){
-  this.get();
   return new TreeNode('T', this.parseF(), this.parseB());
 };
 
@@ -87,8 +86,8 @@ Calculator.prototype.parseF = function(){
   } else if (nextToken && nextToken.name === 'SUB'){
     this.get();
     return new TreeNode('F', '-', this.parseF());
-  } else {
-    return new TreeNode(this.get());
+  } else if(nextToken.name === 'NUMBER') {
+    return new TreeNode('F', this.get().value);
   }
 };
 
@@ -97,28 +96,54 @@ function TreeNode(name, ...children){
   this.children = children;
 }
 
-// var calc = new Calculator('1+(2*3)+4');
-// //console.log(calc.tokenStream);
-// console.log(calc.get());
-// console.log(calc.peek());
-// console.log(calc.tokenStream);
+TreeNode.prototype.accept = function(visitor){
+  return visitor.visit(this);
+};
 
-// var node = new TreeNode('awesome', 1, 3, 4, 5);
-// console.log(node.name);
-// console.log(node.children);
+function InfixVisitor(){
+  this.visit = function(node) {
+    switch (node.name){
+      case 'Expression':
+        return node.children[0].accept(this) + node.children[1].accept(this);
+        break;
 
-// var calculator = new Calculator("(3)");
+      case 'T':
+        return node.children[0].accept(this) + node.children[1].accept(this);
+        break;
 
-// // make a fake version of parseExpression
-// var fakeExpressionTreeNode = new TreeNode("Expression", "3");
-// calculator.parseExpression = function() {
-//   this.get(); // remove the 3 when parseFactor runs
-//   return fakeExpressionTreeNode;
-// };
+      case 'A':
+        if (node.children.length > 0){
+          return node.children[0] + node.children[1].accept(this) + node.children[2].accept(this);
+        } else {
+          return '';
+        }
+        break;
 
-// var output = calculator.parseF();
-// // check that
-// console.log(output.name);
-// // output.name == "Factor"
-// console.log(output.children);
-// // output.children = ["(", fakeExpressionTreeNode, ")"];
+      case 'F':
+        if (node.children.length === 3){
+          return node.children[0] + node.children[1].accept(this) + node.children[2];
+        } else if (node.children.length === 2){
+          return node.children[0] + node.children[1].accept(this);
+        } else {
+          return node.children[0];
+        }
+        break;
+
+      case 'B':
+        if (node.children.length > 0){
+          return node.children[0] + node.children[1].accept(this) + node.children[2].accept(this);
+        } else {
+          return '';
+        }
+        break;
+
+      default:
+        break;
+    }
+  };
+}
+
+var calc = new Calculator('1+3*4');
+var tree = calc.parseExpression();
+var printInfix = new InfixVisitor();
+console.log(tree.accept(printInfix));
